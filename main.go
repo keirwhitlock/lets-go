@@ -8,6 +8,12 @@ import (
 // define a home handler func which writes a byte
 // slice as the resp body
 func home(w http.ResponseWriter, r *http.Request) {
+	// Check if the current request URL matches "/"; else 404
+
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
 	w.Write([]byte("Hello World!"))
 }
 
