@@ -24,7 +24,15 @@ func main() {
 	fileserver := http.FileServer(http.Dir(*static_dir))
 	mux.Handle("/static/", http.StripPrefix("/static", fileserver))
 
+	// Initialize a new http.Server struct, so we can set a custom logger
+	// for error log handling.
+	srv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errorLog,
+		Handler:  mux,
+	}
+
 	infoLog.Printf("Starting server on %s", *addr)
-	err := http.ListenAndServe(*addr, mux)
+	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
