@@ -8,12 +8,14 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql" // blank identifier alias, underscore stops compiler throwing and error
+	"github.com/kwhitlock/lets-go-book/pkg/models/mysql"
 )
 
 // application struct
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	snippets *mysql.SnippetModel
 }
 
 func main() {
@@ -38,6 +40,9 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: &mysql.SnippetModel{
+			DB: db,
+		},
 	}
 
 	// Initialize a new http.Server struct, so we can set a custom logger
