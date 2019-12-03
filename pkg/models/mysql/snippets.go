@@ -17,12 +17,23 @@ func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
 	stmt := `INSERT INTO snippets (title, content, created, expires)
 	VALUES(?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
 
-	result, err := m.DB.Exec(stmt, title, content, expires)
+	transaction, err := m.DB.Begin()
 	if err != nil {
+		return 0, err
+	}
+
+	result, err := transaction.Exec(stmt, title, content, expires)
+	if err != nil {
+		transaction.Rollback()
 		return 0, nil
 	}
 
 	id, err := result.LastInsertId()
+	if err != nil {
+		transaction.Rollback()
+		return 0, err
+	}
+	err = transaction.Commit()
 	if err != nil {
 		return 0, err
 	}
