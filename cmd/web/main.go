@@ -3,9 +3,11 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 
 	_ "github.com/go-sql-driver/mysql" // blank identifier alias, underscore stops compiler throwing and error
 	"github.com/kwhitlock/lets-go-book/pkg/models/mysql"
@@ -19,6 +21,11 @@ type application struct {
 }
 
 func main() {
+
+	// setup a channel to read from, of size 1
+	killSignal := make(chan os.Signal, 1)
+	// use os.signal.Notify to send a notification based on the type of os signal.
+	signal.Notify(killSignal, os.Interrupt)
 
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	staticDir := flag.String("static", "./ui/static/", "Directory where static files are located.")
@@ -53,9 +60,17 @@ func main() {
 		Handler:  app.routes(*staticDir),
 	}
 
-	infoLog.Printf("Starting server on %s", *addr)
-	err = srv.ListenAndServe()
-	errorLog.Fatal(err)
+	// anonymous function
+	go func() {
+		infoLog.Printf("Starting server on %s", *addr)
+		err = srv.ListenAndServe()
+		errorLog.Fatal(err)
+	}()
+
+	// read off the killSignal channel
+	<-killSignal
+	fmt.Println("Thanks for using the app.")
+	// time.Sleep(30 * time.Second)
 }
 
 func openDB(dsn string) (*sql.DB, error) {
