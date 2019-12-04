@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -15,9 +16,10 @@ import (
 
 // application struct
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	snippets *mysql.SnippetModel
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	snippets      *mysql.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -43,6 +45,13 @@ func main() {
 
 	defer db.Close()
 
+	// init a new template cache
+	infoLog.Printf("Initializing a new template in memory cache")
+	templateCache, err := newTemplateCache("./ui/html/")
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	// initialise a new instance of the application
 	app := &application{
 		errorLog: errorLog,
@@ -50,6 +59,7 @@ func main() {
 		snippets: &mysql.SnippetModel{
 			DB: db,
 		},
+		templateCache: templateCache,
 	}
 
 	// Initialize a new http.Server struct, so we can set a custom logger
