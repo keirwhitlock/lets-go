@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (app *application) routes(staticDir string) *http.ServeMux {
+func (app *application) routes(staticDir string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", app.home)
 	mux.HandleFunc("/snippet", app.showSnippet)
@@ -13,5 +13,5 @@ func (app *application) routes(staticDir string) *http.ServeMux {
 	fileserver := http.FileServer(http.Dir(staticDir))
 	mux.Handle("/static/", http.StripPrefix("/static", fileserver))
 
-	return mux
+	return secureHeaders(mux)
 }
