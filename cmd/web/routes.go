@@ -13,5 +13,5 @@ func (app *application) routes(staticDir string) http.Handler {
 	fileserver := http.FileServer(http.Dir(staticDir))
 	mux.Handle("/static/", http.StripPrefix("/static", fileserver))
 
-	return secureHeaders(mux)
+	return app.logRequest(secureHeaders(mux))
 }
