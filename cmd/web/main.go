@@ -9,8 +9,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql" // blank identifier alias, underscore stops compiler throwing and error
+	"github.com/golangcollege/sessions"
 	"github.com/kwhitlock/lets-go-book/pkg/models/mysql"
 )
 
@@ -18,6 +20,7 @@ import (
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
+	session       *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 }
@@ -32,6 +35,7 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	staticDir := flag.String("static", "./ui/static/", "Directory where static files are located.")
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
+	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Secret session key")
 
 	flag.Parse()
 
@@ -52,10 +56,14 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
+
 	// initialise a new instance of the application
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		session:  session,
 		snippets: &mysql.SnippetModel{
 			DB: db,
 		},
