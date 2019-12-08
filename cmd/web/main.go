@@ -87,10 +87,13 @@ func main() {
 	// Initialize a new http.Server struct, so we can set a custom logger
 	// for error log handling.
 	srv := &http.Server{
-		Addr:      *addr,
-		ErrorLog:  errorLog,
-		Handler:   app.routes(*staticDir),
-		TLSConfig: tlsConfig,
+		Addr:         *addr,
+		ErrorLog:     errorLog,
+		Handler:      app.routes(*staticDir),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	// anonymous function
