@@ -13,18 +13,21 @@
             <h1><a href='/'>Snippetbox</a></h1>
         </header>
         <nav>
-            <!-- Update the navigation to include signup, login and
-            logout links -->
             <div>
                 <a href='/'>Home</a>
-                <a href='/snippet/create'>Create snippet</a>
+                {{if .AuthenticatedUser}}
+                    <a href='/snippet/create'>Create snippet</a>
+                {{end}}
             </div>
             <div>
-                <a href='/user/signup'>Signup</a>
-                <a href='/user/login'>Login</a>
-                <form action='/user/logout' method='POST'>
-                    <button>Logout</button>
-                </form>
+                {{if .AuthenticatedUser}}
+                    <form action='/user/logout' method='POST'>
+                        <button>Logout</button>
+                    </form>
+                {{else}}
+                    <a href='/user/signup'>Signup</a>
+                    <a href='/user/login'>Login</a>
+                {{end}}
             </div>
         </nav>
         <section>
