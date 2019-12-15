@@ -17,6 +17,10 @@ import (
 	"github.com/kwhitlock/lets-go-book/pkg/models/mysql"
 )
 
+type contextKey string
+
+var contextKeyUser = contextKey("user")
+
 // application struct
 type application struct {
 	errorLog      *log.Logger
