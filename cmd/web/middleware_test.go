@@ -8,6 +8,15 @@ import (
 )
 
 func TestSecureHeaders(t *testing.T) {
+	/*
+		You can indicate that it's OK for a test to be run in concurrently
+		alongside other tests by calling the t.Parallel() function at the
+		start of the test.
+
+		Tests marked using t.Parallel() will be run in parallel with — and
+		only with — other parallel tests.
+	*/
+	t.Parallel()
 	// init a new resp writer
 	rr := httptest.NewRecorder()
 
