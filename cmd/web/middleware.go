@@ -7,7 +7,14 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/kwhitlock/lets-go-book/pkg/models"
+	"github.com/aws/aws-xray-sdk-go/xray"
 )
+
+func xrayAWS (next http.Handler) http.Handler {
+	return xray.Handler(xray.NewFixedSegmentNamer("Snippets"), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		next.ServeHTTP(w, r)
+	}))
+}
 
 func secureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
